@@ -35,16 +35,18 @@
                 </tr>
             </thead>
             <tbody>
-                <tr>
-                    <td>Londrina</td>
-                    <td>Paraná</td>
-                    <td>
-                        <div class="d-flex djustify-content-center">
-                            <a class="btn btn-warning mr-3">Alterar</a>
-                            <a class="btn btn-danger mr-3">Excluir</a>
-                        </div>
-                    </td>
-                </tr>
+                <#list listaCidades as cidade >
+                    <tr>
+                        <td>${cidade.nome}</td>
+                        <td>${cidade.estado}</td>
+                        <td>
+                            <div class="d-flex djustify-content-center">
+                                <a class="btn btn-warning mr-3">Alterar</a>
+                                <a class="btn btn-danger mr-3">Excluir</a>
+                            </div>
+                        </td>
+                    </tr>
+                </#list>
             </tbody>
         </table>
     </div>
