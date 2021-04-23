@@ -14,16 +14,26 @@
             <h1>Gerenciamento de Cidades</h1>
             <p>Um Crudo para criar, alterar, excluir, editar e listar Cidades</p>
         </div>
-        <form>
+        <#if cidadeAtual??>
+            <form action="/alterar" method="post">
+                <input type="hidden" name="nomeAtual" value="${(cidadeAtual.nome)!}">
+                <input type="hidden" name="estadoAtual" value="${(cidadeAtual.estado)!}">
+        <#else>
+            <form action="/criar" method="post">
+        </#if>
             <div class="form-group">
                 <label for="nome">Cidade:</label>
-                <input type="text" class="form-control" placeholder="Informe o nome da Cidade" id="nome">
+                <input type="text" value="${(cidadeAtual.nome)!}" name="nome" class="form-control" placeholder="Informe o nome da Cidade" id="nome">
             </div>
             <div class="form-group">
                 <label for="estado">Estado:</label>
-                <input type="text" class="form-control" placeholder="Informe o estado ao qual a cidede pertence" id="estado">
+                <input type="text" value="${(cidadeAtual.estado)!}" name="estado" class="form-control" placeholder="Informe o estado ao qual a cidede pertence" id="estado">
             </div>
-            <button type="submit" class="btn btn-primary">Criar</button>
+            <#if cidadeAtual??>
+                <button type="submit" class="btn btn-primary">Concluir Alteração</button>
+            <#else>
+                <button type="submit" class="btn btn-primary">Criar</button>
+            </#if>
         </form>
 
         <table class="table table-striped table-hover mt-5">
@@ -41,8 +51,8 @@
                         <td>${cidade.estado}</td>
                         <td>
                             <div class="d-flex djustify-content-center">
-                                <a class="btn btn-warning mr-3">Alterar</a>
-                                <a class="btn btn-danger mr-3">Excluir</a>
+                                <a href="/preparaAlterar?nome=${cidade.nome}&estado=${cidade.estado}" class="btn btn-warning mr-3">Alterar</a>
+                                <a href="/excluir?nome=${cidade.nome}&estado=${cidade.estado}" class="btn btn-danger mr-3">Excluir</a>
                             </div>
                         </td>
                     </tr>
