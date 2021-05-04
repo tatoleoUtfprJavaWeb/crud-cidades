@@ -2,70 +2,97 @@ package br.edu.utfpr.cp.espjava.crudCidades.visao;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import javax.validation.Valid;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Controller
 public class CidadeController {
 
     private Set<Cidade> cidades;
+    private final CidadeRepository repository;
 
-    public CidadeController() {
+    public CidadeController(CidadeRepository repository) {
+        this.repository = repository;
         this.cidades = new HashSet<>();
     }
 
     @GetMapping("/")
     public String listar(Model model){
-        model.addAttribute("listaCidades", cidades);
+        model.addAttribute("listaCidades",
+                repository.findAll().stream()
+                    .map(cidade -> new Cidade(cidade.getNome(), cidade.getEstado()))
+                    .collect(Collectors.toList())
+        );
         return "/crud";
     }
 
     @PostMapping("/criar")
-    public String criar(Cidade cidade){
-        cidades.add(cidade);
+    public String criar(@Valid Cidade cidade, BindingResult validacao, Model model){
+
+        if (validacao.hasErrors()){
+            validacao.getFieldErrors()
+                    .forEach(fieldError ->
+                                model.addAttribute(fieldError.getField(), fieldError.getDefaultMessage())
+                            );
+            model.addAttribute("nomeInformado", cidade.getNome());
+            model.addAttribute("estadoInformado", cidade.getEstado());
+            model.addAttribute("listaCidades", cidades);
+            return "/crud";
+
+        } else {
+            var novaCidade = new CidadeEntidade();
+            novaCidade.setNome(cidade.getNome());
+            novaCidade.setEstado(cidade.getEstado());
+            repository.save(novaCidade);
+        }
+
         return "redirect:/";
     }
 
     @GetMapping("/excluir")
     public String excluir(@RequestParam String nome, @RequestParam String estado){
-        cidades.removeIf(cidadeAtual ->
-                cidadeAtual.getNome().equals(nome) &&
-                        cidadeAtual.getEstado().equals(estado)
-        );
+
+        var cidadeEstadoEncontrada = repository.findByNomeAndEstado(nome, estado);
+
+        cidadeEstadoEncontrada.ifPresent(repository::delete);
+
         return "redirect:/";
     }
 
     @GetMapping("/preparaAlterar")
     public String preparaAlterar(@RequestParam String nome, @RequestParam String estado, Model model){
 
-        var cidadeAtual = cidades.stream()
-                            . filter(cidade ->
-                                        cidade.getNome().equals(nome) &&
-                                        cidade.getEstado().equals(estado)
-                                    ).findAny();
+        var cidadeAtual = repository.findByNomeAndEstado(nome, estado);
 
-        if (cidadeAtual.isPresent()){
-            model.addAttribute("cidadeAtual", cidadeAtual.get());
-            model.addAttribute("listaCidades", cidades);
-        }
+        cidadeAtual.ifPresent( cidadeEncontrada -> {
+            model.addAttribute("cidadeAtual", cidadeEncontrada);
+            model.addAttribute("listaCidades", repository.findAll());
+        });
+
         return "/crud";
     }
 
 
     @PostMapping("/alterar")
-    public String alterar(@RequestParam String nomeAtual, @RequestParam String estadoAtual, Cidade cidade){
+    public String alterar(@RequestParam String nomeAtual, @RequestParam String estadoAtual, @Valid Cidade cidade,
+                          BindingResult validacao, Model model){
 
-        cidades.removeIf(cidadeAtual ->
-                cidadeAtual.getNome().equals(nomeAtual) &&
-                        cidadeAtual.getEstado().equals(estadoAtual)
-        );
+        var cidadeAtual = repository.findByNomeAndEstado(nomeAtual, estadoAtual);
 
-        criar(cidade);
+        if (cidadeAtual.isPresent()) {
+            var cidadeEncontrada = cidadeAtual.get();
+            cidadeEncontrada.setNome(cidade.getNome());
+            cidadeEncontrada.setEstado(cidade.getEstado());
 
+            repository.saveAndFlush(cidadeEncontrada);
+        }
         return "redirect:/";
     }
 }

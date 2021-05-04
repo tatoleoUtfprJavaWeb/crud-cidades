@@ -15,19 +15,27 @@
             <p>Um Crudo para criar, alterar, excluir, editar e listar Cidades</p>
         </div>
         <#if cidadeAtual??>
-            <form action="/alterar" method="post">
+            <form action="/alterar" method="post" class="needs-validation" novalidate>
                 <input type="hidden" name="nomeAtual" value="${(cidadeAtual.nome)!}">
                 <input type="hidden" name="estadoAtual" value="${(cidadeAtual.estado)!}">
         <#else>
-            <form action="/criar" method="post">
+            <form action="/criar" method="post" class="needs-validation" novalidate>
         </#if>
             <div class="form-group">
                 <label for="nome">Cidade:</label>
-                <input type="text" value="${(cidadeAtual.nome)!}" name="nome" class="form-control" placeholder="Informe o nome da Cidade" id="nome">
+                <input required type="text" value="${(cidadeAtual.nome)!}${nomeInformado!}" name="nome"
+                       class="form-control ${(nome??)?then('is-invalid', '')}" placeholder="Informe o nome da Cidade" id="nome">
+                <div class="invalid-feedback">
+                    ${nome!}
+                </div>
             </div>
             <div class="form-group">
                 <label for="estado">Estado:</label>
-                <input type="text" value="${(cidadeAtual.estado)!}" name="estado" class="form-control" placeholder="Informe o estado ao qual a cidede pertence" id="estado">
+                <input required maxlength="2" type="text" value="${(cidadeAtual.estado)!}${estadoInformado!}" name="estado"
+                       class="form-control ${(estado??)?then('is-invalid', '')}" placeholder="Informe o estado ao qual a cidede pertence" id="estado">
+                <div class="invalid-feedback">
+                    ${estado!}
+                </div>
             </div>
             <#if cidadeAtual??>
                 <button type="submit" class="btn btn-primary">Concluir Alteração</button>
