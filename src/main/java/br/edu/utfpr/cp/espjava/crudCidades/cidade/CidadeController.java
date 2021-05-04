@@ -1,4 +1,4 @@
-package br.edu.utfpr.cp.espjava.crudCidades.visao;
+package br.edu.utfpr.cp.espjava.crudCidades.cidade;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -47,10 +47,7 @@ public class CidadeController {
             return "/crud";
 
         } else {
-            var novaCidade = new CidadeEntidade();
-            novaCidade.setNome(cidade.getNome());
-            novaCidade.setEstado(cidade.getEstado());
-            repository.save(novaCidade);
+            repository.save(cidade.clonar());
         }
 
         return "redirect:/";

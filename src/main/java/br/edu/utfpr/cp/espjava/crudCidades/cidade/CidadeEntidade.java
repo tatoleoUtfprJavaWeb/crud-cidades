@@ -1,11 +1,9 @@
-package br.edu.utfpr.cp.espjava.crudCidades.visao;
+package br.edu.utfpr.cp.espjava.crudCidades.cidade;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Size;
 import java.io.Serializable;
 
 @Entity(name = "cidade")
